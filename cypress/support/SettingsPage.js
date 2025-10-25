@@ -1,56 +1,61 @@
-import PageObject from '../PageObject';
+import PageObject from './PageObject';
+import faker from 'faker';
 
 class SettingsPage extends PageObject {
   url = '/settings';
 
   // Form fields
-  get usernameField() {
-    return cy.get('[data-cy="username-settings"]');
+  get usernameField() { return cy.get('[data-cy="username-input"]'); }
+  get bioField() { return cy.get('[data-cy="bio-input"]'); }
+  get emailField() { return cy.get('[data-cy="email-input"]'); }
+  get passwordField() { return cy.get('[data-cy="password-input"]'); }
+  get saveBtn() { return cy.get('[data-cy="save-settings-btn"]'); }
+  get logoutBtn() { return cy.get('[data-cy="logout-btn"]'); }
+
+  // Low-level actions
+  typeUsername(username) { this.usernameField.clear().type(username); }
+  typeBio(bio) { this.bioField.clear().type(bio); }
+  typeEmail(email) { this.emailField.clear().type(email); }
+  typePassword(password) { this.passwordField.clear().type(password); }
+  clickSave() { this.saveBtn.click(); }
+  clickLogout() { this.logoutBtn.click(); }
+
+  // High-level methods
+  updateUsername(username) {
+    this.typeUsername(username);
+    this.clickSave();
   }
 
-  get bioField() {
-    return cy.get('[data-cy="bio-settings"]');
+  updateBio(bio) {
+    this.typeBio(bio);
+    this.clickSave();
   }
 
-  get emailField() {
-    return cy.get('[data-cy="email-settings"]');
+  updateEmail(email) {
+    this.typeEmail(email);
+    this.clickSave();
   }
 
-  get passwordField() {
-    return cy.get('[data-cy="password-settings"]');
+  updatePassword(password) {
+    this.typePassword(password);
+    this.clickSave();
   }
 
-  get updateBtn() {
-    return cy.get('[data-cy="update-settings-btn"]');
+  logOut() {
+    this.clickLogout();
   }
 
-  get logoutBtn() {
-    return cy.get('[data-cy="logout-btn"]');
+  // Assertions
+  assertUsernameUpdated(username) {
+    cy.get('[data-cy="username-display"]').should('contain', username);
   }
 
-  // Actions
-  typeUsername(username) {
-    this.usernameField.clear().type(username);
+  assertBioUpdated(bio) {
+    cy.get('[data-cy="bio-display"]').should('contain', bio);
   }
 
-  typeBio(bio) {
-    this.bioField.clear().type(bio);
-  }
-
-  typeEmail(email) {
-    this.emailField.clear().type(email);
-  }
-
-  typePassword(password) {
-    this.passwordField.clear().type(password);
-  }
-
-  clickUpdate() {
-    this.updateBtn.click();
-  }
-
-  clickLogout() {
-    this.logoutBtn.click();
+  assertEmailUpdated(email) {
+    cy.get('[data-cy="email-display"]').should('contain', email);
   }
 }
 
