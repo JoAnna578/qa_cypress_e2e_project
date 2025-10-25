@@ -1,24 +1,22 @@
 /// <reference types='cypress' />
-import SettingsPage from '../support/SettingsPage';
-import faker from 'faker';
-import SignInPage from '../support/pages/signIn.pageObject';
+/// <reference types='../support' />
 
-describe('Settings page', () => {
+import SettingsPage from '../support/pages/SettingsPage';
+import SignInPage from '../support/pages/SignInPage';
+import { faker } from '@faker-js/faker';
+
+describe('Settings page tests', () => {
   const settingsPage = new SettingsPage();
   const signInPage = new SignInPage();
   const user = {
     email: 'testuser@example.com',
-    password: 'Password123'
+    password: 'Test@1234'
   };
 
-  before(() => {
-    cy.task('db:clear');
+  beforeEach(() => {
+    cy.task('db:clear'); // czyszczenie bazy danych
     signInPage.visit();
     signInPage.signIn(user.email, user.password);
-  });
-
-  beforeEach(() => {
-    settingsPage.visit();
   });
 
   it('should update username', () => {
@@ -40,9 +38,9 @@ describe('Settings page', () => {
   });
 
   it('should update password', () => {
-    const newPassword = faker.internet.password();
+    const newPassword = 'NewPass@123';
     settingsPage.updatePassword(newPassword);
-    // nie ma asercji dla hasła, można ewentualnie ponownie zalogować użytkownika
+    settingsPage.assertPasswordUpdated(newPassword); // np. poprzez wylogowanie i ponowne logowanie
   });
 
   it('should log out', () => {
