@@ -1,55 +1,50 @@
 /// <reference types='cypress' />
-import ArticlePage from '../support/ArticlePage';
-import faker from 'faker';
-import SignInPage from '../support/pages/signIn.pageObject';
+/// <reference types='../support' />
 
-describe('Article', () => {
+import ArticlePage from '../support/pages/ArticlePage';
+import SignInPage from '../support/pages/SignInPage';
+import { faker } from '@faker-js/faker';
+
+describe('Article tests', () => {
   const articlePage = new ArticlePage();
   const signInPage = new SignInPage();
   const user = {
     email: 'testuser@example.com',
-    password: 'Password123'
+    password: 'Test@1234'
   };
 
-  before(() => {
-    cy.task('db:clear'); // czyścimy bazę danych
+  beforeEach(() => {
+    cy.task('db:clear'); // czyszczenie bazy danych
     signInPage.visit();
     signInPage.signIn(user.email, user.password);
   });
 
-  beforeEach(() => {
-    cy.task('db:clear'); // każdy test startuje z czystą bazą
-  });
-
   it('should create a new article', () => {
     const articleData = {
-      title: faker.lorem.sentence(),
+      title: faker.lorem.words(3),
       description: faker.lorem.sentence(),
-      body: faker.lorem.paragraph(),
-      tags: faker.lorem.words(3)
+      body: faker.lorem.paragraphs(2),
+      tags: 'test,automation'
     };
 
-    articlePage.visit(); // otwieramy formularz
+    articlePage.visitNewArticleForm();
     articlePage.createArticle(articleData);
-    articlePage.assertArticleCreated(articleData);
+    articlePage.assertArticleCreated(articleData.title, articleData.body);
   });
 
   it('should edit an article', () => {
     const articleData = {
-      title: faker.lorem.sentence(),
+      title: faker.lorem.words(3),
       description: faker.lorem.sentence(),
-      body: faker.lorem.paragraph(),
-      tags: faker.lorem.words(3)
+      body: faker.lorem.paragraphs(2),
+      tags: 'edit,test'
     };
 
-    articlePage.visit();
+    // tworzymy własny artykuł dla testu
+    articlePage.visitNewArticleForm();
     articlePage.createArticle(articleData);
 
-    const updatedData = {
-      ...articleData,
-      body: faker.lorem.paragraph()
-    };
-
+    const updatedData = { ...articleData, body: 'Updated body content' };
     articlePage.searchArticle(articleData.title);
     articlePage.editArticle(updatedData);
     articlePage.assertArticleUpdated(updatedData.body);
@@ -57,13 +52,13 @@ describe('Article', () => {
 
   it('should delete an article', () => {
     const articleData = {
-      title: faker.lorem.sentence(),
+      title: faker.lorem.words(3),
       description: faker.lorem.sentence(),
-      body: faker.lorem.paragraph(),
-      tags: faker.lorem.words(3)
+      body: faker.lorem.paragraphs(2),
+      tags: 'delete,test'
     };
 
-    articlePage.visit();
+    articlePage.visitNewArticleForm();
     articlePage.createArticle(articleData);
 
     articlePage.searchArticle(articleData.title);
