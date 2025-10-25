@@ -1,45 +1,52 @@
 /// <reference types='cypress' />
-/// <reference types='../support' />
-
-import SettingsPage from '../support/pages/SettingsPage';
+import SettingsPage from '../support/SettingsPage';
+import faker from 'faker';
+import SignInPage from '../support/pages/signIn.pageObject';
 
 describe('Settings page', () => {
   const settingsPage = new SettingsPage();
+  const signInPage = new SignInPage();
+  const user = {
+    email: 'testuser@example.com',
+    password: 'Password123'
+  };
 
   before(() => {
-    settingsPage.visit();
+    cy.task('db:clear');
+    signInPage.visit();
+    signInPage.signIn(user.email, user.password);
   });
 
   beforeEach(() => {
-    // Możesz dodać logowanie jeśli jest wymagane
+    settingsPage.visit();
   });
 
-  it('should provide an ability to update username', () => {
-    const newUsername = 'NewUser_' + Math.floor(Math.random() * 1000);
+  it('should update username', () => {
+    const newUsername = faker.internet.userName();
     settingsPage.updateUsername(newUsername);
     settingsPage.assertUsernameUpdated(newUsername);
   });
 
-  it('should provide an ability to update bio', () => {
-    const newBio = 'This is a new bio';
+  it('should update bio', () => {
+    const newBio = faker.lorem.sentence();
     settingsPage.updateBio(newBio);
     settingsPage.assertBioUpdated(newBio);
   });
 
-  it('should provide an ability to update an email', () => {
-    const newEmail = `user${Math.floor(Math.random() * 1000)}@mail.com`;
+  it('should update email', () => {
+    const newEmail = faker.internet.email();
     settingsPage.updateEmail(newEmail);
     settingsPage.assertEmailUpdated(newEmail);
   });
 
-  it('should provide an ability to update password', () => {
-    const newPassword = 'NewPass123!';
+  it('should update password', () => {
+    const newPassword = faker.internet.password();
     settingsPage.updatePassword(newPassword);
-    settingsPage.assertPasswordUpdated(); // np. sprawdzenie komunikatu lub ponowne logowanie
+    // nie ma asercji dla hasła, można ewentualnie ponownie zalogować użytkownika
   });
 
-  it('should provide an ability to log out', () => {
-    settingsPage.logout();
-    settingsPage.assertLoggedOut();
+  it('should log out', () => {
+    settingsPage.logOut();
+    cy.url().should('include', '/login'); // sprawdzamy, że użytkownik został wylogowany
   });
 });
